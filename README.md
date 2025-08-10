@@ -8,7 +8,7 @@ A tiny Flask app + OpenAI that scores how well a resume matches a job descriptio
 2. **Get an OpenAI API key** and keep it handy.
 3. Open a terminal and run:
    ```bash
-   docker run -e OPENAI_API_KEY=sk-XXXX -p 8000:8000 syedmudabbir/resume-matcher:latest
+   docker run -e OPENAI_API_KEY=sk-XXXX -p 8000:8000 mudabbir1187/resume-matcher:latest
    ```
 4. Visit **http://localhost:8000** in your browser.
 5. Paste your **Job Description** and **Resume**, then click **Analyze match**.
