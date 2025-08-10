@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Resume ↔ Job Match</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="/static/styles.css" rel="stylesheet">
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background:#0f172a; color:#e2e8f0; }
+    .container{ max-width:1200px; margin:0 auto; padding:24px; }
+    h1{ margin:0 0 8px; }
+    .subtitle{ opacity:.8; margin:0 0 16px; }
+    .grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .card{ background:#111827; border:1px solid #1f2937; border-radius:14px; padding:12px; }
+    label{ display:block; font-weight:600; margin-bottom:6px; }
+    textarea, input{ width:100%; background:#0b1220; color:#e2e8f0; border:1px solid #1f2937; border-radius:10px; padding:10px; }
+    button{ margin-top:12px; padding:10px 16px; border-radius:10px; border:0; background:#2563eb; color:#fff; font-weight:600; cursor:pointer; }
+    .hidden{ display:none; }
+    .score-wrap{ display:flex; align-items:center; gap:10px; margin:12px 0; }
+    .score-bar{ flex:1; height:10px; background:#1f2937; border-radius:999px; overflow:hidden; }
+    .score-bar > div{ height:100%; width:0; background:#22c55e; transition:width .6s ease; }
+    .score-text{ min-width:32px; text-align:right; }
+    .result-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .result-card{ background:#111827; border:1px solid #1f2937; border-radius:14px; padding:12px; }
+    pre{ white-space:pre-wrap; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Resume ↔ Job Match</h1>
+    <p class="subtitle">Paste your job description and resume. We’ll score the fit and highlight strengths and gaps.</p>
+
+    <div class="grid">
+      <div class="card">
+        <label for="job_description">Job description</label>
+        <textarea id="job_description" rows="12" placeholder="Paste the JD here..."></textarea>
+      </div>
+      <div class="card">
+        <label for="resume">Resume</label>
+        <textarea id="resume" rows="12" placeholder="Paste your resume here..."></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <label for="criteria">Optional keywords/criteria (comma-separated)</label>
+      <input id="criteria" type="text" placeholder="e.g., Python, AWS, Kubernetes, SQL">
+    </div>
+
+    <button id="analyzeBtn">Analyze match</button>
+
+    <div id="loading" class="hidden">Analyzing…</div>
+
+    <div id="result" class="hidden">
+      <h2>Match result</h2>
+      <div class="score-wrap">
+        <div class="score-label">Score:</div>
+        <div class="score-bar"><div id="scoreFill"></div></div>
+        <div id="scoreText" class="score-text">0</div>
+      </div>
+
+      <div class="result-grid">
+        <div class="result-card">
+          <h3>Summary</h3>
+          <pre id="summary"></pre>
+        </div>
+        <div class="result-card">
+          <h3>Strengths</h3>
+          <ul id="strengths"></ul>
+        </div>
+        <div class="result-card">
+          <h3>Gaps</h3>
+          <ul id="gaps"></ul>
+        </div>
+        <div class="result-card">
+          <h3>Missing keywords</h3>
+          <ul id="missing_keywords"></ul>
+        </div>
+        <div class="result-card">
+          <h3>Recommendations</h3>
+          <ul id="recommendations"></ul>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <small>Local-only processing except the model call. Never paste confidential info.</small>
+    </footer>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const toArray = (v) => Array.isArray(v) ? v : (v ? String(v).split(/\n|;|,/).map(s=>s.trim()).filter(Boolean) : []);
+    const listToUl = (el, v) => { el.innerHTML = ""; toArray(v).forEach(t => { const li = document.createElement("li"); li.textContent = t; el.appendChild(li); }); };
+
+    $("analyzeBtn").addEventListener("click", async () => {
+      const job_description = $("job_description").value.trim();
+      const resume = $("resume").value.trim();
+      const criteria = $("criteria").value.trim();
+
+      if (!job_description || !resume) {
+        alert("Please provide both job description and resume.");
+        return;
+      }
+
+      $("loading").classList.remove("hidden");
+      $("result").classList.add("hidden");
+
+      try {
+        const res = await fetch("/match", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({ job_description, resume, criteria })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          alert(data.error || "Server error");
+          return;
+        }
+
+        const score = Math.max(0, Math.min(100, Number(data.score || 0)));
+        $("scoreFill").style.width = score + "%";
+        $("scoreText").textContent = String(score);
+        $("summary").textContent = data.summary || "";
+        listToUl($("strengths"), data.strengths || []);
+        listToUl($("gaps"), data.gaps || []);
+        listToUl($("missing_keywords"), data.missing_keywords || []);
+        listToUl($("recommendations"), data.recommendations || []);
+
+        $("result").classList.remove("hidden");
+      } catch (e) {
+        alert("Network or server error. See console.");
+        console.error(e);
+      } finally {
+        $("loading").classList.add("hidden");
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+/* static/styles.css */
+:root {
+  --bg: #0f172a;
+  --card: #111827;
+  --text: #e5e7eb;
+  --muted: #94a3b8;
+  --accent: #22c55e;
+  --accent-dim: #166534;
+  --border: #1f2937;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: linear-gradient(180deg, #0b1020 0%, #0f172a 100%);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+.container { max-width: 1100px; margin: 40px auto; padding: 0 16px; }
+h1 { margin: 0 0 8px; font-size: 28px; }
+.subtitle { color: var(--muted); margin-bottom: 20px; }
+
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+label { display: block; font-weight: 600; margin-bottom: 6px; color: #cbd5e1; }
+
+textarea {
+  width: 100%;
+  resize: vertical;
+  background: #0b1220;
+  color: var(--text);
+  border: 1px solid #253046;
+  border-radius: 8px;
+  padding: 10px;
+  line-height: 1.4;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  background: #0b1220;
+  color: var(--text);
+  border: 1px solid #253046;
+  border-radius: 8px;
+}
+
+button {
+  margin-top: 14px;
+  background: var(--accent);
+  color: #052e16;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+button:hover { background: #16a34a; }
+
+#loading { margin: 16px 0; }
+.hidden { display: none; }
+
+#result { margin-top: 18px; }
+.score-wrap { display: flex; align-items: center; gap: 10px; }
+.score-label { min-width: 52px; color: var(--muted); }
+.score-bar {
+  flex: 1;
+  height: 12px;
+  background: #0b1220;
+  border: 1px solid #253046;
+  border-radius: 999px;
+  overflow: hidden;
+}
+#scoreFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #4ade80);
+  width: 0%;
+  transition: width 300ms ease;
+}
+.score-text { min-width: 32px; text-align: right; }
+
+.result-grid {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+@media (max-width: 900px) { .result-grid { grid-template-columns: 1fr; } }
+
+.result-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+.result-card h3 { margin-top: 0; }
+pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 0;
+}
+ul { margin: 0; padding-left: 18px; }
+footer { margin-top: 22px; color: var(--muted); }
